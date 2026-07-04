@@ -3,7 +3,7 @@
 <html lang="en">
 
 <head>
-    <title>Code coverage report for src/db/redis.js</title>
+    <title>Code coverage report for src/middlewares/rateLimit.js</title>
     <meta charset="utf-8" />
     <link rel="stylesheet" href="../../prettify.css" />
     <link rel="stylesheet" href="../../base.css" />
@@ -19,20 +19,20 @@
 <body>
 <div class='wrapper'>
     <div class='pad1'>
-        <h1><a href="../../index.html">All files</a> / <a href="index.html">src/db</a> redis.js</h1>
+        <h1><a href="../../index.html">All files</a> / <a href="index.html">src/middlewares</a> rateLimit.js</h1>
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">69.56% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>16/23</span>
+                <span class='fraction'>24/24</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">50% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>1/2</span>
+                <span class='fraction'>0/0</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">69.56% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>16/23</span>
+                <span class='fraction'>24/24</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line medium'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -85,7 +85,8 @@
 <a name='L20'></a><a href='#L20'>20</a>
 <a name='L21'></a><a href='#L21'>21</a>
 <a name='L22'></a><a href='#L22'>22</a>
-<a name='L23'></a><a href='#L23'>23</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<a name='L23'></a><a href='#L23'>23</a>
+<a name='L24'></a><a href='#L24'>24</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -95,41 +96,43 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span></td><td class="text"><pre class="prettyprint lang-js">const Redis = require('ioredis');
-const RedisMock = require('ioredis-mock');
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span></td><td class="text"><pre class="prettyprint lang-js">const rateLimit = require('express-rate-limit');
 &nbsp;
-let redis;
 &nbsp;
-if (process.env.NODE_ENV === 'test') {
-    // Agar environment 'test' hai toh fake redis use karo
-    redis = new RedisMock();
-    console.log("Using Mock Redis for Testing");
-}<span class="branch-0 cbranch-no" title="branch not covered" > else {</span>
-<span class="cstat-no" title="statement not covered" >    // Production ya Development ke liye asli redis</span>
-<span class="cstat-no" title="statement not covered" >    redis = new Redis({</span>
-<span class="cstat-no" title="statement not covered" >        host: process.env.REDIS_HOST,</span>
-<span class="cstat-no" title="statement not covered" >        port: process.env.REDIS_PORT,</span>
-<span class="cstat-no" title="statement not covered" >        password: process.env.REDIS_PASSWORD</span>
-<span class="cstat-no" title="statement not covered" >    });</span>
-<span class="cstat-no" title="statement not covered" >}</span>
-&nbsp;
-redis.on('connect', () =&gt; {
-    console.log("Connected to Redis");
+const loginLimiter = rateLimit({
+    windowMs:15*60*1000,
+    max:5,
+    message:{
+        success:false,
+         message: 'Too many login attempts. Try again later.'
+    }
 });
 &nbsp;
-module.exports = redis;</pre></td></tr></table></pre>
+const registerLimiter = rateLimit({
+    windowMs:15*60*1000,
+    max:5,
+    message:{
+        success:false,
+         message: 'Too many register attempts. Try again later.'
+    }
+});
+&nbsp;
+module.exports = {
+    loginLimiter,registerLimiter
+}</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
             </div><!-- /wrapper -->

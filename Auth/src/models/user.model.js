@@ -42,7 +42,7 @@ const userSchema = new mongoose.Schema({
     addresses: [
       addressSchema
     ]
-});
+},{ timestamps: true });
 
 const userModel = mongoose.model('user', userSchema);
 

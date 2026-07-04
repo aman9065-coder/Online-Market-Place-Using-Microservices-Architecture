@@ -8,6 +8,7 @@ const {connect} = require('./src/broker/broker');
 connectedToDB();
 connect();
 
-app.listen('5000',()=>{
-    console.log('Auth service is listening on port 5000');
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+    console.log(`Auth service is listening on port ${PORT}`);
 });

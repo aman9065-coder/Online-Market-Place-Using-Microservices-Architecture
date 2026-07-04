@@ -15,7 +15,7 @@ describe('POST /api/auth/register', () => {
                 firstname: "John",
                 lastname: 'Doe'
             },
-            role:'user'
+            role: 'user'
         });
         expect(res.statusCode).toBe(201);
         expect(res.body.user).toBeDefined();
@@ -46,6 +46,7 @@ describe('POST /api/auth/register', () => {
 
         expect(res.statusCode).toBe(409);
         expect(res.body).toHaveProperty('message');
+        expect(res.body.message).toBe("username or email already exists");
 
     });
 
@@ -61,6 +62,7 @@ describe('POST /api/auth/register', () => {
 
         expect(res.statusCode).toBe(400);
         expect(res.body).toHaveProperty('errors');
+        expect(res.body.errors.length).toBeGreaterThan(0);
     });
 
 });

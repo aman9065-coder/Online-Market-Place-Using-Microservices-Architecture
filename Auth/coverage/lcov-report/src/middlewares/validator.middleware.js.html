@@ -135,12 +135,12 @@
 <a name='L70'></a><a href='#L70'>70</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">13x</span>
-<span class="cline-any cline-yes">13x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">11x</span>
-<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-yes">22x</span>
+<span class="cline-any cline-yes">22x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">19x</span>
+<span class="cline-any cline-yes">19x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -168,10 +168,10 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">16x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">16x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -201,30 +201,30 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span></td><td class="text"><pre class="prettyprint lang-js">const {body, validationResult } = require('express-validator');
+<span class="cline-any cline-yes">1x</span></td><td class="text"><pre class="prettyprint lang-js">const { body, validationResult } = require('express-validator');
 &nbsp;
-const responseWithValidationErrors = (req,res,next) =&gt;{
+const responseWithValidationErrors = (req, res, next) =&gt; {
     const errors = validationResult(req);
-    if(!errors.isEmpty()){
-        return res.status(400).json({errors:errors.array()});
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
     }
     next();
-} 
+}
 &nbsp;
 &nbsp;
 const registerUserValidation = [
     body('username').isString().withMessage('username must be string')
-    .isLength({min:3}).withMessage('username must be atleast 3 characters long'),
+        .isLength({ min: 3 }).withMessage('username must be atleast 3 characters long'),
     body('email').isEmail().withMessage('invalid email format'),
-    body('password').isLength({min:6}).withMessage('password must be at least 6 characters long'),
+    body('password').isLength({ min: 6 }).withMessage('password must be at least 6 characters long'),
     body('fullname.firstname').isString().withMessage('first name must be string')
-    .notEmpty().withMessage('first name is required'),
+        .notEmpty().withMessage('first name is required'),
     body('fullname.lastname').isString().withMessage('last name must be string')
-    .notEmpty().withMessage('last name is required'),
+        .notEmpty().withMessage('last name is required'),
     body('role').
-    optional()
-    .isIn('user','seller')
-    .withMessage("role must be either 'user' or 'seller'"),
+        optional()
+        .isIn(['user', 'seller'])
+        .withMessage("role must be either 'user' or 'seller'"),
 &nbsp;
     responseWithValidationErrors
 &nbsp;
@@ -232,21 +232,21 @@ const registerUserValidation = [
 &nbsp;
 const loginUserValidation = [
     body('username').isString().withMessage('username must be string')
-    .isLength({min:3}).withMessage('username must be atleast 3 characters long')
-    .optional(),
+        .isLength({ min: 3 }).withMessage('username must be atleast 3 characters long')
+        .optional(),
     body('email').isEmail().withMessage('invalid email format').optional(),
-    body('password').isLength({min:6}).withMessage('password must be at least 6 characters long'),
-    body().custom(body=&gt;{
-         if(!body.username &amp;&amp; !body.email)<span class="branch-0 cbranch-no" title="branch not covered" >{</span>
+    body('password').isLength({ min: 6 }).withMessage('password must be at least 6 characters long'),
+    body().custom(body =&gt; {
+        if (!body.username &amp;&amp; !body.email) <span class="branch-0 cbranch-no" title="branch not covered" >{</span>
 <span class="cstat-no" title="statement not covered" >            throw new Error("Either username or email is required")</span>
-<span class="cstat-no" title="statement not covered" >         }</span>
-         return true;
+<span class="cstat-no" title="statement not covered" >        }</span>
+        return true;
     }),
     responseWithValidationErrors
 ]
 &nbsp;
 const addUserAddressValidation = [
-     body('addresses').isArray({min:1}).withMessage("At least one address is required"),
+    body('addresses').isArray({ min: 1 }).withMessage("At least one address is required"),
     body('addresses.*.street')
         .notEmpty().withMessage('street is required'),
 &nbsp;
@@ -277,7 +277,7 @@ module.exports = {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-01-09T11:59:07.882Z
+                at 2026-07-04T11:44:45.421Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

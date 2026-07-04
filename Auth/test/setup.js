@@ -1,6 +1,7 @@
 const {MongoMemoryServer} = require('mongodb-memory-server');
 const mongoose = require('mongoose');
 const connectedToDB = require('../src/db/db');
+const redis = require('../src/db/redis');
 require('dotenv').config();
 
 
@@ -13,17 +14,19 @@ beforeAll(async()=>{
     await connectedToDB();
 });
 
-afterEach(async()=>{
+afterEach(async()=>{ 
     const collections = await mongoose.connection.db.collections();
 
     for(let collection of collections){
         await collection.deleteMany({});
     }
+     await redis.flushall();
 });
 
 afterAll(async()=>{
     await mongoose.disconnect();
     await mongoServer.stop();
+    await redis.quit();
 });
 
 //  Pure Flow ko Ek Example se Samjho:
@@ -38,3 +41,5 @@ afterAll(async()=>{
 // afterEach: DB se "B" ko delete kar diya (DB fir se Khali).
 
 // afterAll: Server hi band kar diya.
+
+

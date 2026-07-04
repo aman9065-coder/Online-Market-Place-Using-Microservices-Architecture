@@ -4,13 +4,15 @@ const authController = require('../controllers/auth.controller');
 const authMiddleware = require('../middlewares/auth.middleware')
 
 const router = express.Router();
+const {loginLimiter,registerLimiter} = require('../middlewares/rateLimit');
 
-router.post('/register',validator.registerUserValidation,authController.registerUser);
-router.post('/login',validator.loginUserValidation,authController.loginUser);
+router.post('/register',registerLimiter,validator.registerUserValidation,authController.registerUser);
+
+router.post('/login',loginLimiter,validator.loginUserValidation,authController.loginUser);
 router.get('/me',authMiddleware.authMiddleware,authController.getUser);
 router.get('/logout',authController.logoutUser);
 router.get('/user/me/addresses',authMiddleware.authMiddleware,authController.getUserAddress);
-router.post('/user/me/addresses',validator.addUserAddressValidation,authMiddleware.authMiddleware,authController.addUserAddress);
+router.post('/user/me/addresses',authMiddleware.authMiddleware,validator.addUserAddressValidation,authController.addUserAddress);
 router.delete('/user/me/addresses/:addressesId',authMiddleware.authMiddleware,authController.deleteUserAddress);
 
 

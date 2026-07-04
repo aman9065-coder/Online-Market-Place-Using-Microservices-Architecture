@@ -2,8 +2,6 @@ const request = require('supertest');
 const app = require('../src/app');
 const userModel = require('../src/models/user.model');
 const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-
 
 
 
@@ -46,6 +44,16 @@ describe('POST /api/auth/login', () => {
 
     });
 
+    it('user not found with 401',async()=>{
+         
+        const res = await request(app).post('/api/auth/login').send({
+            username: "unknown",
+            password: "Secret123!"
+        });
+
+        expect(res.statusCode).toBe(401);
+        expect(res.body.message).toBe('invalid credentials : user not found');
+    });
     it('rejects wrong password with 401',async()=>{
          const password = "Secret123!";
         const hash = await bcrypt.hash(password,10);
@@ -72,7 +80,7 @@ describe('POST /api/auth/login', () => {
         });
 
         expect(res.statusCode).toBe(401);
-        expect(res.body.message).toBe('invalid credentials');
+        expect(res.body.message).toBe("invalid credentials : password is invalid");
     });
 
     it('validates missing fields with 400', async () => {
@@ -80,10 +88,9 @@ describe('POST /api/auth/login', () => {
             username: 'john_doe',
             email:'test@example.com',
         }
-        const res = await request(app).post('/api/auth/register').send(incompleteData);
+        const res = await request(app).post('/api/auth/login').send(incompleteData);
 
         expect(res.statusCode).toBe(400);
         expect(res.body).toHaveProperty('errors');
     });
 });
-
