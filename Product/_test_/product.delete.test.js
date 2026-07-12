@@ -4,16 +4,18 @@ const jwt = require('jsonwebtoken');
 const productModel = require('../src/models/product.model');
 const { mongoose } = require('mongoose');
 
-jest.mock('uuid', () => ({
-    v4: () => 'test-uuid'
-}));
+
+
 jest.mock('../src/service/imagekit.service', () => {
-    return jest.fn().mockResolvedValue({
-        url: 'http://test-image.com/sample.jpg',
-        thumbnail: 'http://test-image.com/thumb.jpg',
-        id: 'mock_id_123'
-    });
-});
+    return {
+        uploadImage: jest.fn().mockResolvedValue({
+            url: 'http://test-image.com/sample.jpg',
+            thumbnail: 'http://test-image.com/thumb.jpg',
+            id: 'mock_id_123'
+        }),
+        deleteImage: jest.fn().mockResolvedValue(undefined)
+    };
+}); 
 const sellerId = new mongoose.Types.ObjectId();
 
 describe('DELETE /api/products/:id', () => {
@@ -114,3 +116,39 @@ describe('DELETE /api/products/:id', () => {
     });
 
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

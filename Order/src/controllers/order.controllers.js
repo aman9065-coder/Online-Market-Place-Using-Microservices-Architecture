@@ -15,6 +15,7 @@ async function createOrder(req, res) {
       }
     });
 
+    // Ye array of objects hai.
     const cartItems = cartResponse.data.cart.items;
 
     // Check if cart is empty

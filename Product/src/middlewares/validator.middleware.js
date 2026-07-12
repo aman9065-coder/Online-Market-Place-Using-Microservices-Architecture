@@ -26,7 +26,8 @@ const productValidationRules = [
         .withMessage('price amount must be number > 0'),
 
     body('priceCurrency')
-        .optional()
+        .notEmpty()
+        .withMessage('price currency is required')
         .isIn(['USD', 'INR'])
         .withMessage('priceCurrency must be USD or INR'),
     body('category')

@@ -4,19 +4,22 @@ const app = require('../src/app');
 const mongoose = require('mongoose');
 const productModel = require('../src/models/product.model');
 
-jest.mock('uuid', () => ({
-    v4: () => 'test-uuid'
-}));
+
+
+
 jest.mock('../src/service/imagekit.service', () => {
-    return jest.fn().mockResolvedValue({
-        url: 'http://test-image.com/sample.jpg',
-        thumbnail: 'http://test-image.com/thumb.jpg',
-        id: 'mock_id_123'
-    });
-});
+    return {
+        uploadImage: jest.fn().mockResolvedValue({
+            url: 'http://test-image.com/sample.jpg',
+            thumbnail: 'http://test-image.com/thumb.jpg',
+            id: 'mock_id_123'
+        }),
+        deleteImage: jest.fn().mockResolvedValue(undefined)
+    };
+}); 
 
 describe('GET /api/products/seller', () => {
-    const sellerId = new mongoose.Types.ObjectId();
+    const sellerId = new mongoose.Types.ObjectId(); 
 
     it('returns 401 when no auth cookie is provided', async () => {
         const res = await request(app).get(`/api/products/seller`)
@@ -37,7 +40,7 @@ describe('GET /api/products/seller', () => {
     });
 
     it('returns 200 with product when auth cookie is provided', async () => {
-        const token = jwt.sign({ id: sellerId.toString(), role: 'seller', username: 'john@123', email: 'test@example.com' }, process.env.JWT_SECRET);
+        const token = jwt.sign({ id: sellerId, role: 'seller', username: 'john@123', email: 'test@example.com' }, process.env.JWT_SECRET);
         const product = await productModel.create({
             title: 'test_title',
             description: 'test_desc',
@@ -62,7 +65,7 @@ describe('GET /api/products/seller', () => {
         expect(res.body.data[0].title).toBe('test_title');
     });
     it('returns empty array when seller has no products', async () => {
-        const token = jwt.sign({ id: sellerId.toString(), role: 'seller', username: 'john@123', email: 'test@example.com' }, process.env.JWT_SECRET);
+        const token = jwt.sign({ id: sellerId, role: 'seller', username: 'john@123', email: 'test@example.com' }, process.env.JWT_SECRET);
         const res = await request(app).get(`/api/products/seller`)
             .set(`Authorization`, `Bearer ${token}`);
 
@@ -70,7 +73,7 @@ describe('GET /api/products/seller', () => {
         expect(res.body.data).toEqual([]);
     });
     it('applies skip and limit query params', async () => {
-        const token = jwt.sign({ id: sellerId.toString(), role: 'seller', username: 'john@123', email: 'test@example.com' }, process.env.JWT_SECRET);
+        const token = jwt.sign({ id: sellerId, role: 'seller', username: 'john@123', email: 'test@example.com' }, process.env.JWT_SECRET);
 
         await productModel.insertMany([
             {
@@ -89,7 +92,7 @@ describe('GET /api/products/seller', () => {
     });
     it('returns 403 when user is not seller', async () => {
         const token = jwt.sign({
-            id: sellerId.toString(),
+            id: sellerId,
             username: "john_doe",
             email: "test@example.com",
             role: "user"

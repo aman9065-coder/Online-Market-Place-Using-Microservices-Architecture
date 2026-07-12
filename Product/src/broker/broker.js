@@ -1,6 +1,16 @@
 const amqplib = require('amqplib');
 
 let channel, connection;
+if (process.env.NODE_ENV === 'test') {
+    console.log('Using Mock Broker for Testing');
+    module.exports = {
+        connect: async () => {},
+        publishToQueue: async () => {},
+        subscribeToQueue: async () => {},
+        channel: null,
+        connection: null,
+    };
+} else {
 
 async function connect() {
     if (connection) return connection;
@@ -41,6 +51,8 @@ async function subscribeToQueue(queueName, callback) {
     });
 }
 
+
 module.exports = {
-    connect, connection, channel,publishToQueue,subscribeToQueue
+    connect,publishToQueue,subscribeToQueue
+}
 }

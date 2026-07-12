@@ -7,6 +7,7 @@ const productValidator = require('../middlewares/validator.middleware');
 
 const upload = multer({ storage: multer.memoryStorage() });
 
+// admit aur seller hi product create kr skta h isliye role based authentication kr rhe ,  user product create nhi 
 router.post('/', upload.array('images'), createAuthMiddleware(['admin', 'seller']), productValidator.productValidationRules, productController.createProduct);
 router.get('/',productController.getProducts);
 router.patch('/:id', upload.array('images'),createAuthMiddleware(['seller']),productController.updateProduct);

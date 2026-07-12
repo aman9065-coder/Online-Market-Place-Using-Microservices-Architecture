@@ -4,16 +4,18 @@ const app = require('../src/app');
 const mongoose = require('mongoose');
 const productModel = require('../src/models/product.model');
 
-jest.mock('uuid', () => ({
-  v4: () => 'test-uuid'
-}));
+
+
 jest.mock('../src/service/imagekit.service', () => {
-    return jest.fn().mockResolvedValue({
-        url: 'http://test-image.com/sample.jpg',
-        thumbnail: 'http://test-image.com/thumb.jpg',
-        id: 'mock_id_123'
-    });
-});
+    return {
+        uploadImage: jest.fn().mockResolvedValue({
+            url: 'http://test-image.com/sample.jpg',
+            thumbnail: 'http://test-image.com/thumb.jpg',
+            id: 'mock_id_123'
+        }),
+        deleteImage: jest.fn().mockResolvedValue(undefined)
+    };
+}); 
 describe('GET /api/products/:id',()=>{
   it('returns 200 and the product when valid id is provided',async()=>{
     let productId;
@@ -45,7 +47,7 @@ describe('GET /api/products/:id',()=>{
         expect(res.body.product.images[0].url).toBe('http://test-image.com/sample.jpg');
 
   });
-  it('returns 400 for invalid id format ',async()=>{
+  it('returns 400 for invalid id format ',async()=>{ 
       const res = await request(app).get(`/api/products/123-invalid-id`);
 
         expect(res.statusCode).toBe(400);

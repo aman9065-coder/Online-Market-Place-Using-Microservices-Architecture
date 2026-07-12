@@ -6,12 +6,15 @@ const mongoose = require('mongoose');
 
 
 jest.mock('../src/service/imagekit.service', () => {
-    return jest.fn().mockResolvedValue({
-        url: 'http://test-image.com/sample.jpg',
-        thumbnail: 'http://test-image.com/thumb.jpg',
-        id: 'mock_id_123'
-    });
-});
+    return {
+        uploadImage: jest.fn().mockResolvedValue({
+            url: 'http://test-image.com/sample.jpg',
+            thumbnail: 'http://test-image.com/thumb.jpg',
+            id: 'mock_id_123'
+        }),
+        deleteImage: jest.fn().mockResolvedValue(undefined)
+    };
+}); 
 
 const sellerId = new mongoose.Types.ObjectId().toString();
 
@@ -21,7 +24,7 @@ describe('POST /api/products/', () => {
         const token = jwt.sign({ id: sellerId, role: 'seller', username: 'john@123', email: 'test@example.com' }, process.env.JWT_SECRET);
 
         const res = await request(app)
-            .post('/api/products/')
+            .post('/api/products/') 
             .set(`Authorization`, `Bearer ${token}`)
             .field('title', 'test_title')
             .field('description', 'test_description')
@@ -90,4 +93,134 @@ describe('POST /api/products/', () => {
     });
 
 
+    it('should return 400 if title is missing', async () => {
+        const token = jwt.sign({ id: sellerId, role: 'seller', username: 'john@123', email: 'test@example.com' }, process.env.JWT_SECRET);
+
+        const res = await request(app)
+            .post('/api/products/')
+            .set('Authorization', `Bearer ${token}`)
+            .field('description', 'test_description')
+            .field('priceAmount', 1233)
+            .field('priceCurrency', 'INR')
+            .field('category', 'Clothes')
+            .attach('images', Buffer.from('dummy-image'), 'sample.jpg');
+
+        expect(res.statusCode).toBe(400);
+        expect(res.body.errors).toBeDefined();
+        expect(res.body.errors.some(e => e.msg === 'title is required')).toBe(true);
+    });
+    it('should return 400 if title is empty string', async () => {
+        const token = jwt.sign({ id: sellerId, role: 'seller', username: 'john@123', email: 'test@example.com' }, process.env.JWT_SECRET);
+
+        const res = await request(app)
+            .post('/api/products/')
+            .set('Authorization', `Bearer ${token}`)
+            .field('title', '')
+            .field('priceAmount', 1233)
+            .field('priceCurrency', 'INR')
+            .attach('images', Buffer.from('dummy-image'), 'sample.jpg');
+
+        expect(res.statusCode).toBe(400);
+        expect(res.body.errors.some(e => e.msg === 'title is required')).toBe(true);
+    });
+    it('should return 400 if priceAmount is missing', async () => {
+        const token = jwt.sign({ id: sellerId, role: 'seller', username: 'john@123', email: 'test@example.com' }, process.env.JWT_SECRET);
+
+        const res = await request(app)
+            .post('/api/products/')
+            .set('Authorization', `Bearer ${token}`)
+            .field('title', 'test_title')
+            .field('priceCurrency', 'INR')
+            .attach('images', Buffer.from('dummy-image'), 'sample.jpg');
+
+        expect(res.statusCode).toBe(400);
+        expect(res.body.errors.some(e => e.msg === 'price amount is required')).toBe(true);
+    });
+    it('should return 400 if priceAmount is 0 or negative', async () => {
+        const token = jwt.sign({ id: sellerId, role: 'seller', username: 'john@123', email: 'test@example.com' }, process.env.JWT_SECRET);
+
+        const res = await request(app)
+            .post('/api/products/')
+            .set('Authorization', `Bearer ${token}`)
+            .field('title', 'test_title')
+            .field('priceAmount', -5)
+            .field('priceCurrency', 'INR')
+            .attach('images', Buffer.from('dummy-image'), 'sample.jpg');
+
+        expect(res.statusCode).toBe(400);
+        expect(res.body.errors.some(e => e.msg === 'price amount must be number > 0')).toBe(true);
+    });
+    it('should return 400 if priceAmount is not a number', async () => {
+        const token = jwt.sign({ id: sellerId, role: 'seller', username: 'john@123', email: 'test@example.com' }, process.env.JWT_SECRET);
+
+        const res = await request(app)
+            .post('/api/products/')
+            .set('Authorization', `Bearer ${token}`)
+            .field('title', 'test_title')
+            .field('priceAmount', 'abc')
+            .field('priceCurrency', 'INR')
+            .attach('images', Buffer.from('dummy-image'), 'sample.jpg');
+
+        expect(res.statusCode).toBe(400);
+        expect(res.body.errors.some(e => e.msg === 'price amount must be number > 0')).toBe(true);
+    });
+    it('should return 400 if priceCurrency is invalid', async () => {
+        const token = jwt.sign({ id: sellerId, role: 'seller', username: 'john@123', email: 'test@example.com' }, process.env.JWT_SECRET);
+
+        const res = await request(app)
+            .post('/api/products/')
+            .set('Authorization', `Bearer ${token}`)
+            .field('title', 'test_title')
+            .field('priceAmount', 1233)
+            .field('priceCurrency', 'EUR')
+            .attach('images', Buffer.from('dummy-image'), 'sample.jpg');
+
+        expect(res.statusCode).toBe(400);
+        expect(res.body.errors.some(e => e.msg === 'priceCurrency must be USD or INR')).toBe(true);
+    });
+    it('should return 400 if description exceeds 500 characters', async () => {
+        const token = jwt.sign({ id: sellerId, role: 'seller', username: 'john@123', email: 'test@example.com' }, process.env.JWT_SECRET);
+        const longDescription = 'a'.repeat(501);
+
+        const res = await request(app)
+            .post('/api/products/')
+            .set('Authorization', `Bearer ${token}`)
+            .field('title', 'test_title')
+            .field('description', longDescription)
+            .field('priceAmount', 1233)
+            .field('priceCurrency', 'INR')
+            .attach('images', Buffer.from('dummy-image'), 'sample.jpg');
+
+        expect(res.statusCode).toBe(400);
+        expect(res.body.errors.some(e => e.msg === 'description max length is 500 characters')).toBe(true);
+    });
+    it('should pass when description is exactly 500 characters', async () => {
+        const token = jwt.sign({ id: sellerId, role: 'seller', username: 'john@123', email: 'test@example.com' }, process.env.JWT_SECRET);
+        const exactDescription = 'a'.repeat(500);
+
+        const res = await request(app)
+            .post('/api/products/')
+            .set('Authorization', `Bearer ${token}`)
+            .field('title', 'test_title')
+            .field('description', exactDescription)
+            .field('priceAmount', 1233)
+            .field('priceCurrency', 'INR')
+            .attach('images', Buffer.from('dummy-image'), 'sample.jpg');
+
+        expect(res.statusCode).toBe(201);
+    });
+    it('should pass when optional fields (description, category) are omitted', async () => {
+        const token = jwt.sign({ id: sellerId, role: 'seller', username: 'john@123', email: 'test@example.com' }, process.env.JWT_SECRET);
+
+        const res = await request(app)
+            .post('/api/products/')
+            .set('Authorization', `Bearer ${token}`)
+            .field('title', 'test_title')
+            .field('priceAmount', 1233)
+            .field('priceCurrency', 'INR')
+            .attach('images', Buffer.from('dummy-image'), 'sample.jpg');
+
+        expect(res.statusCode).toBe(201);
+    });
+    
 });

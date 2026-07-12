@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">28.57% </span>
+                <span class="strong">22.41% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>14/49</span>
+                <span class='fraction'>13/58</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">28.57% </span>
+                <span class="strong">22.41% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>14/49</span>
+                <span class='fraction'>13/58</span>
             </div>
         
             
@@ -111,7 +111,16 @@
 <a name='L46'></a><a href='#L46'>46</a>
 <a name='L47'></a><a href='#L47'>47</a>
 <a name='L48'></a><a href='#L48'>48</a>
-<a name='L49'></a><a href='#L49'>49</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -124,7 +133,16 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -162,7 +180,6 @@
 <span class="cline-any cline-no">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">const amqplib = require('amqplib');
 &nbsp;
 let channel, connection;
-&nbsp;
 if (process.env.NODE_ENV === 'test') {
     console.log('Using Mock Broker for Testing');
     module.exports = {
@@ -174,39 +191,49 @@ if (process.env.NODE_ENV === 'test') {
     };
 }<span class="branch-0 cbranch-no" title="branch not covered" > else {</span>
 <span class="cstat-no" title="statement not covered" ></span>
-<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >    async function connect() {</span></span>
-<span class="cstat-no" title="statement not covered" >        if (connection) return connection;</span>
-<span class="cstat-no" title="statement not covered" >        try {</span>
-<span class="cstat-no" title="statement not covered" >            connection = await amqplib.connect(process.env.RABBIT_URL);</span>
-<span class="cstat-no" title="statement not covered" >            console.log('connected to RabbitMQ');</span>
-<span class="cstat-no" title="statement not covered" >            channel = await connection.createChannel();</span>
-<span class="cstat-no" title="statement not covered" >        } catch (err) {</span>
-<span class="cstat-no" title="statement not covered" >            console.log('Error connecting to RabbitMQ', err);</span>
+<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >async function connect() {</span></span>
+<span class="cstat-no" title="statement not covered" >    if (connection) return connection;</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >    try {</span>
+<span class="cstat-no" title="statement not covered" >        connection = await amqplib.connect(process.env.RABBIT_URL)</span>
+<span class="cstat-no" title="statement not covered" >        console.log('connected to RabbitMQ');</span>
+<span class="cstat-no" title="statement not covered" >        channel = await connection.createChannel();</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >    } catch (err) {</span>
+<span class="cstat-no" title="statement not covered" >        console.log('Error connecting to RabbitMQ', err);</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >    }</span>
+<span class="cstat-no" title="statement not covered" >}</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >async function publishToQueue(queueName, data = {}) {</span></span>
+<span class="cstat-no" title="statement not covered" >    if (!connection || !channel) await connect();</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >    await channel.assertQueue(queueName, {</span>
+<span class="cstat-no" title="statement not covered" >        durable: true</span>
+<span class="cstat-no" title="statement not covered" >    });</span>
+<span class="cstat-no" title="statement not covered" >    channel.sendToQueue(queueName, Buffer.from(JSON.stringify(data)));</span>
+<span class="cstat-no" title="statement not covered" >    console.log('message sent to queue', queueName, data);</span>
+<span class="cstat-no" title="statement not covered" >}</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >async function subscribeToQueue(queueName, callback) {</span></span>
+<span class="cstat-no" title="statement not covered" >    if (!connection || !channel) await connect();</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >    await channel.assertQueue(queueName, {</span>
+<span class="cstat-no" title="statement not covered" >        durable: true</span>
+<span class="cstat-no" title="statement not covered" >    });</span>
+<span class="cstat-no" title="statement not covered" >    channel.consume(queueName, async (msg) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >        if (msg != null) {</span>
+<span class="cstat-no" title="statement not covered" >          const data = JSON.parse(msg.content.toString());</span>
+<span class="cstat-no" title="statement not covered" >          await callback(data);</span>
+<span class="cstat-no" title="statement not covered" >          channel.ack(msg);</span>
 <span class="cstat-no" title="statement not covered" >        }</span>
-<span class="cstat-no" title="statement not covered" >    }</span>
+<span class="cstat-no" title="statement not covered" >    });</span>
+<span class="cstat-no" title="statement not covered" >}</span>
 <span class="cstat-no" title="statement not covered" ></span>
-<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >    async function publishToQueue(queueName, data = {}) {</span></span>
-<span class="cstat-no" title="statement not covered" >        if (!connection || !channel) await connect();</span>
-<span class="cstat-no" title="statement not covered" >        await channel.assertQueue(queueName, { durable: true });</span>
-<span class="cstat-no" title="statement not covered" >        channel.sendToQueue(queueName, Buffer.from(JSON.stringify(data)));</span>
-<span class="cstat-no" title="statement not covered" >        console.log('message sent to queue', queueName, data);</span>
-<span class="cstat-no" title="statement not covered" >    }</span>
 <span class="cstat-no" title="statement not covered" ></span>
-<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >    async function subscribeToQueue(queueName, callback) {</span></span>
-<span class="cstat-no" title="statement not covered" >        if (!connection || !channel) await connect();</span>
-<span class="cstat-no" title="statement not covered" >        await channel.assertQueue(queueName, { durable: true });</span>
-<span class="cstat-no" title="statement not covered" >        channel.consume(queueName, async (msg) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >            if (msg != null) {</span>
-<span class="cstat-no" title="statement not covered" >                const data = JSON.parse(msg.content.toString());</span>
-<span class="cstat-no" title="statement not covered" >                await callback(data);</span>
-<span class="cstat-no" title="statement not covered" >                channel.ack(msg);</span>
-<span class="cstat-no" title="statement not covered" >            }</span>
-<span class="cstat-no" title="statement not covered" >        });</span>
-<span class="cstat-no" title="statement not covered" >    }</span>
-<span class="cstat-no" title="statement not covered" ></span>
-<span class="cstat-no" title="statement not covered" >    module.exports = {</span>
-<span class="cstat-no" title="statement not covered" >        connect, connection, channel, publishToQueue, subscribeToQueue</span>
-<span class="cstat-no" title="statement not covered" >    };</span>
+<span class="cstat-no" title="statement not covered" >module.exports = {</span>
+<span class="cstat-no" title="statement not covered" >    connect,publishToQueue,subscribeToQueue</span>
+<span class="cstat-no" title="statement not covered" >}</span>
 <span class="cstat-no" title="statement not covered" >}</span></pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
@@ -214,7 +241,7 @@ if (process.env.NODE_ENV === 'test') {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-07-09T13:48:18.721Z
+                at 2026-07-12T07:51:05.235Z
             </div>
         <script src="../../prettify.js"></script>
         <script>
