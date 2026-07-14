@@ -96,12 +96,4 @@ describe('GET /api/cart/items', () => {
     expect(res.body.totals.itemQuantity).toBe(2);
     expect(res.body.totals.totalQuantity).toBe(5);
     });
-
-
-
-
-
-
-  
-
 });

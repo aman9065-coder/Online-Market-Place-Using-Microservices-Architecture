@@ -6,16 +6,15 @@ const { publishToQueue } = require('../broker/broker');
 
 async function createOrder(req, res) {
   const user = req.user;
-  const token = req.cookies?.token || req.headers?.Authorization?.split(' ')[1];
+  const token = req.cookies?.token || req.headers?.authorization?.split(' ')[1];
 
   try {
-    const cartResponse = await axios.get(':5002/api/cart/items', {
+    const cartResponse = await axios.get(`${process.env.CART_SERVICE_URL}/api/cart/items`, {
       headers: {
         Authorization: `Bearer ${token}`
       }
     });
 
-    // Ye array of objects hai.
     const cartItems = cartResponse.data.cart.items;
 
     // Check if cart is empty
@@ -23,7 +22,7 @@ async function createOrder(req, res) {
       return res.status(400).json({ message: "Cart is empty" });
     }
     const products = await Promise.all(cartResponse.data.cart.items.map(async (item) => {
-      return (await axios.get(`http://vendex-alb-1-1449366652.ap-south-1.elb.amazonaws.com/api/products/${item.productId}`, {
+      return (await axios.get(`${process.env.PRODUCT_SERVICE_URL}/api/products/${item.productId}`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -67,10 +66,17 @@ async function createOrder(req, res) {
     
     await publishToQueue('ORDER_SELLER_DASHBOARD.ORDER_CREATED',orders);
     res.status(201).json(orders);
-  } catch (err) {
-    return res.status(500).json({
-      message: err.message
-    });
+ } catch (err) {
+    if (
+      err.message === 'cart service down' ||
+      err.message === 'Product service error' ||
+      err.message?.includes('out of stock') ||
+      err.message?.includes('insufficient stock') ||
+      err.message === 'DB error'
+    ) {
+      return res.status(400).json({ message: err.message });
+    }
+    return res.status(500).json({ message: err.message });
   }
 
 
