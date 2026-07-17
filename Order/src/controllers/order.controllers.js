@@ -4,7 +4,7 @@ const axios = require('axios');
 const { publishToQueue } = require('../broker/broker');
 
 
-async function createOrder(req, res) {
+async function createOrder(req, res) {  
   const user = req.user;
   const token = req.cookies?.token || req.headers?.authorization?.split(' ')[1];
 
@@ -96,7 +96,7 @@ async function getMyOrder(req, res) {
 
     const orders = await orderModel.find({
       user: user.id
-    }).skip(skip).limit(limit).sort({ createdAt: -1 });;
+    }).skip(skip).limit(limit).sort({ createdAt: -1 });
     const totalOrders = await orderModel.countDocuments({ user: user.id });
     const totalPages = Math.ceil(totalOrders / limit);
 

@@ -5,7 +5,7 @@ const mongoose = require("mongoose");
 
 async function createProduct(req, res) {
   try {
-    const { title, description, priceAmount, priceCurrency, category } =
+    const { title, description, priceAmount, priceCurrency, category ,stock} =
       req.body;
 
     const seller = req.user.id;
@@ -28,6 +28,7 @@ async function createProduct(req, res) {
       images,
       category,
       seller,
+      stock
     });
 
     await publishToQueue("PRODUCT_SELLER_DASHBOARD.PRODUCT_CREATED", product);

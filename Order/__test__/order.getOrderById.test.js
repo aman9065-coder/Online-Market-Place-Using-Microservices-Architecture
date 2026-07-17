@@ -18,9 +18,7 @@ describe('GET /api/orders/:id', () => {
                 username: "john_doe",
                 email: "test@example.com",
                 role: "user"
-            },
-                process.env.JWT_SECRET);
-
+            },process.env.JWT_SECRET);
     });
 
 

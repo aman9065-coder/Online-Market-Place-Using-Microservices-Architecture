@@ -5,7 +5,7 @@ const app = require('../src/app');
 const orderModel = require('../src/models/order.models');
 
 
-describe('GET /api/orders/:id/cancel', () => {
+describe('GET /api/orders/:id/address', () => {
     let token;
     let userId;
     let orderId;

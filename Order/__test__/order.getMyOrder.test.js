@@ -18,8 +18,7 @@ describe('GET /api/orders/me', () => {
                 username: "john_doe",
                 email: "test@example.com",
                 role: "user"
-            },
-                process.env.JWT_SECRET);
+            },process.env.JWT_SECRET);
 
     });
 
@@ -51,6 +50,25 @@ describe('GET /api/orders/me', () => {
         expect(res.statusCode).toBe(401);
         expect(res.body.message).toBe('Unauthorized invalid token');
     });
+    it('should return 403 if user does not have permission', async () => {
+      const sellerToken = jwt.sign(
+        {
+          id: new mongoose.Types.ObjectId(),
+          username: 'seller_user',
+          email: 'seller@example.com',
+          role: 'seller' // user nahi hai
+        },
+        process.env.JWT_SECRET
+      );
+    
+      const res = await request(app)
+        .get('/api/orders/me')
+        .set('Authorization', `Bearer ${sellerToken}`)
+    
+      expect(res.statusCode).toBe(403);
+      expect(res.body.message).toBe('Forbidden: insufficient permissions');
+    
+    }); 
 
     it('should return paginated orders', async () => {
         for (let i = 1; i <= 5; i++) {
