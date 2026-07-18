@@ -2,10 +2,10 @@ require('dotenv').config();
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
 const request = require('supertest');
-const app = require('../app');
+const app = require('../src/app');
 const {validatePaymentVerification} = require('razorpay/dist/utils/razorpay-utils');
 const Razorpay = require('razorpay');
-const paymentModel = require('../models/payment.models');
+const paymentModel = require('../src/models/payment.models');
 
 jest.mock('razorpay', () => {
   return jest.fn().mockImplementation(() => ({
@@ -25,7 +25,7 @@ jest.mock('razorpay/dist/utils/razorpay-utils',()=>({
 }));
 
 
-describe('POST /api/payment/create/:orderId', () => {
+describe('POST /api/payment/verify', () => {
     let token;
     let userId;
     let orderId;
@@ -38,8 +38,7 @@ describe('POST /api/payment/create/:orderId', () => {
             username: "john_doe",
             email: "test@example.com",
             role: "user"
-        },
-            process.env.JWT_SECRET);
+        },process.env.JWT_SECRET);
         await paymentModel.create({
             order: orderId,
             user: userId,
@@ -73,6 +72,25 @@ describe('POST /api/payment/create/:orderId', () => {
         expect(res.statusCode).toBe(401);
         expect(res.body.message).toBe("Unauthorized invalid token");
     });
+    it('should return 403 if user role is not allowed', async () => {
+    const forbiddenToken = jwt.sign({
+        id: userId,
+        username: "john_doe",
+        email: "test@example.com",
+        role: "seller" 
+    }, process.env.JWT_SECRET);
+
+     const res = await request(app)
+            .post(`/api/payment/verify`).send({
+                paymentId: "123",
+                signature: "abc",
+                razorpayOrderId: "234"
+            })
+            .set('Authorization', `Bearer ${forbiddenToken}`);
+
+    expect(res.statusCode).toBe(403);
+    expect(res.body.message).toBe("Forbidden: insufficient permissions");
+    });
     it('should return 201 if payment is created', async () => {
         validatePaymentVerification.mockReturnValue(true);
         const res = await request(app).post(`/api/payment/verify`).send({
@@ -98,7 +116,7 @@ describe('POST /api/payment/create/:orderId', () => {
         expect(res.statusCode).toBe(400);
         expect(res.body.message).toBe("Invalid signature");
     });
-     it('should return 404 if payment not found', async () => {
+    it('should return 404 if payment not found', async () => {
         validatePaymentVerification.mockReturnValue(true);
         const res = await request(app)
             .post('/api/payment/verify')

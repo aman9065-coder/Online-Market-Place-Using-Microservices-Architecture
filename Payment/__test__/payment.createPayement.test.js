@@ -2,9 +2,9 @@ require('dotenv').config();
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
 const request = require('supertest');
-const app = require('../app');
+const app = require('../src/app');
 const axios = require('axios');
-const paymentModel = require('../models/payment.models');
+const paymentModel = require('../src/models/payment.models');
 const Razorpay = require('razorpay');
 
 
@@ -34,8 +34,7 @@ describe('POST /api/payment/create/:orderId', () => {
             username: "john_doe",
             email: "test@example.com",
             role: "user"
-        },
-            process.env.JWT_SECRET);
+        },process.env.JWT_SECRET);
 
     });
     it('should return 401 if token is missing', async () => {
@@ -53,6 +52,21 @@ describe('POST /api/payment/create/:orderId', () => {
 
         expect(res.statusCode).toBe(401);
         expect(res.body.message).toBe("Unauthorized invalid token");
+    });
+    it('should return 403 if user role is not allowed', async () => {
+    const forbiddenToken = jwt.sign({
+        id: userId,
+        username: "john_doe",
+        email: "test@example.com",
+        role: "seller" // not allowed because middleware expects 'user'
+    }, process.env.JWT_SECRET);
+
+    const res = await request(app)
+        .post(`/api/payment/create/${orderId}`)
+        .set('Authorization', `Bearer ${forbiddenToken}`);
+
+    expect(res.statusCode).toBe(403);
+    expect(res.body.message).toBe("Forbidden: insufficient permissions");
     });
     it('should return 201 if payment is created', async () => {
         axios.get.mockResolvedValue({
