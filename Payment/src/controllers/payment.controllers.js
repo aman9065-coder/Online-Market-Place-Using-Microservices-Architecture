@@ -19,7 +19,7 @@ async function createPayment(req, res) {
                 Authorization: `Bearer ${token}`
             }
         });
-        const price = orderResponse.data.order.totalAmount;
+        const price = orderResponse.data.order.totalAmount; 
 
         const order = await razorpay.orders.create(price);
 

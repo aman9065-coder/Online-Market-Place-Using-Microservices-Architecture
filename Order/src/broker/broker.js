@@ -29,7 +29,7 @@ if (process.env.NODE_ENV === 'test') {
         await channel.assertQueue(queueName, { durable: true });
         channel.sendToQueue(queueName, Buffer.from(JSON.stringify(data)));
         console.log('message sent to queue', queueName, data);
-    }
+    } 
 
     async function subscribeToQueue(queueName, callback) {
         if (!connection || !channel) await connect();

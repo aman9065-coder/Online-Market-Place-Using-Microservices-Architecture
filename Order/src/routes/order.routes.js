@@ -11,6 +11,4 @@ router.get('/:id',createAuthMiddleware(['user']),orderController.getOrderById);
 router.get('/:id/cancel',createAuthMiddleware(['user']),orderController.cancelOrderById);
 router.patch('/:id/address',createAuthMiddleware(['user']),validation.addUserAddressValidation,orderController.updateOrderAddress);
 
-module.exports = router;
-
-
+module.exports = router; 

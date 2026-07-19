@@ -57,8 +57,7 @@ describe('GET /api/orders/:id/address', () => {
             username: "john_doe",
             email: "test@example.com",
             role: "seller"
-        },
-            process.env.JWT_SECRET);
+        },process.env.JWT_SECRET);
 
         const res = await request(app)
             .patch(`/api/orders/${orderId}/address`)

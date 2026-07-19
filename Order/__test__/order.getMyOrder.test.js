@@ -91,7 +91,7 @@ describe('GET /api/orders/me', () => {
         expect(res.body.meta.hasNextPage).toBe(true);
         expect(res.body.meta.hasPrevPage).toBe(false);
     });
-     it('should return 2nd page correctly', async () => {
+    it('should return 2nd page correctly', async () => {
     for (let i = 1; i <= 5; i++) {
       await orderModel.create({
         user: userId,
@@ -113,7 +113,7 @@ describe('GET /api/orders/me', () => {
     expect(res.body.meta.hasPrevPage).toBe(true);
     });
     it('should default to page=1 and limit=10 for invalid query params', async () => {
-     await orderModel.create({
+    await orderModel.create({
     user: userId,
     items: [{ product: new mongoose.Types.ObjectId(), quantity: 1, price: { amount: 100, currency: 'INR' } }],
     totalAmount: { amount: 100, currency: 'INR' },
@@ -121,13 +121,13 @@ describe('GET /api/orders/me', () => {
     shippingAddress: { street: 'A', city: 'B', state: 'C', country: 'IN', zip: '123456' }
      });
 
-  const res = await request(app)
+    const res = await request(app)
     .get('/api/orders/me?page=abc&limit=xyz')
     .set('Authorization', `Bearer ${token}`);
 
-  expect(res.status).toBe(200);
-  expect(res.body.meta.page).toBe(1);
-  expect(res.body.meta.limit).toBe(10);
+    expect(res.status).toBe(200);
+    expect(res.body.meta.page).toBe(1);
+    expect(res.body.meta.limit).toBe(10);
     });
 
 });

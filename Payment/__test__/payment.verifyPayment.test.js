@@ -102,7 +102,7 @@ describe('POST /api/payment/verify', () => {
         expect(res.statusCode).toBe(200);
         expect(res.body.message).toBe("payment verified successfully");
     });
-     it('should return 400 if razorpay signature is invalid', async () => {
+    it('should return 400 if razorpay signature is invalid', async () => {
         validatePaymentVerification.mockReturnValue(false);
         const res = await request(app)
             .post('/api/payment/verify')

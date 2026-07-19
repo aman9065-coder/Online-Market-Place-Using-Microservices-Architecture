@@ -9,6 +9,7 @@ connect();
 
 
 
-app.listen('5004',()=>{
-    console.log('payment service is listening on port 5004');
+const PORT = process.env.PORT || 5004;
+app.listen(PORT, () => {
+    console.log(`payment service is listening on port ${PORT}`);
 });

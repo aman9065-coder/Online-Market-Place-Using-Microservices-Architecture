@@ -4,7 +4,7 @@ const axios = require('axios');
 const { publishToQueue } = require('../broker/broker');
 
 
-async function createOrder(req, res) {  
+async function createOrder(req, res) {
   const user = req.user;
   const token = req.cookies?.token || req.headers?.authorization?.split(' ')[1];
 
@@ -12,7 +12,7 @@ async function createOrder(req, res) {
     const cartResponse = await axios.get(`${process.env.CART_SERVICE_URL}/api/cart/items`, {
       headers: {
         Authorization: `Bearer ${token}`
-      }
+      } 
     });
 
     const cartItems = cartResponse.data.cart.items;
@@ -78,10 +78,6 @@ async function createOrder(req, res) {
     }
     return res.status(500).json({ message: err.message });
   }
-
-
-
-
 }
 
 async function getMyOrder(req, res) {

@@ -21,27 +21,27 @@ const paymentSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ['PENDING','COMPLETED','FAILED'],
+        enum: ['PENDING', 'COMPLETED', 'FAILED'],
         default: "PENDING"
     },
-    price:{
-        amount:{
-            type:Number,
-            required:true
+    price: {
+        amount: {
+            type: Number,
+            required: true
         },
-        currency:{
-            type:String,
-            required:true,
-            default:"INR",
-            enum:["INR","USD"]
+        currency: {
+            type: String,
+            required: true,
+            default: "INR",
+            enum: ["INR", "USD"]
         }
     },
 
 
 },
-    {
-        timestamps: true
-    });
+{
+    timestamps: true
+});
 
 const paymentModel = mongoose.model('payment', paymentSchema);
 

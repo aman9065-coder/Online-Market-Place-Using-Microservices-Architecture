@@ -5,9 +5,15 @@ const {connect} = require('./src/broker/broker');
 
 
 connectedToDB();
-connect();
+
+const listeners = require('./src/broker/listeners');
+
+connect().then(() => {
+    listeners();
+});
 
 
-app.listen('5003',()=>{
-    console.log("order service is listening on port 5003");
+const PORT = process.env.PORT || 5003;
+app.listen(PORT, () => {
+    console.log(`order service is listening on port ${PORT}`);
 });
