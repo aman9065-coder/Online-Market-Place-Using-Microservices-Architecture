@@ -42,5 +42,5 @@ async function subscribeToQueue(queueName, callback) {
 }
 
 module.exports = {
-    connect, connection, channel,publishToQueue,subscribeToQueue
+    connect, publishToQueue,subscribeToQueue
 }
