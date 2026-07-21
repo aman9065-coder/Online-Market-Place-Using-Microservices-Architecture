@@ -13,27 +13,21 @@ async function getMetrics(req, res) {
 
 
         const productIds = products.map((p) => p._id);
-        // console.log(productIds);
 
 
-        let sales = 0; //kitna order sale
-        let revenue = 0; // kitna paisa
-        let productSales = {}; // top product
+        let sales = 0;
+        let revenue = 0;
+        let productSales = {};
 
         const orders = await orderModel.find({
             'items.product': { $in: productIds },
             'status': { $in: ["CONFIRMED", "DELIEVERED", "COMPLETED", "SHIPPED"] }
         });
-        // console.log(orders);
 
 
         orders.forEach((order) => {
-            // console.log(order);
-
             order.items.forEach((item) => {
-                // console.log(productIds.some(id => id.equals(item.product)));
-
-                if (productIds.map(id => id.equals(item.product))) {
+                if (productIds.some(id => id.equals(item.product))) {
                     sales += item.quantity;
                     revenue += item.price.amount * item.quantity;
                     productSales[item.product] = (productSales[item.product] || 0) + item.quantity;
@@ -41,8 +35,8 @@ async function getMetrics(req, res) {
             })
         });
 
-        const topProducts = Object.entries(productSales).
-            sort((a, b) => b[1] - a[1])
+        const topProducts = Object.entries(productSales)
+            .sort((a, b) => b[1] - a[1])
             .slice(0, 5)
             .map(([product, quantity]) => {
                 const prod = products.find((p) => p._id.equals(product));
@@ -68,21 +62,16 @@ async function getOrders(req, res) {
     try {
         const sellerId = req.user.id;
         const products = await productModel.find({ seller: sellerId });
-        // console.log(products);
-        
+
         const productIds = products.map((p) => p._id);
-        // console.log(productIds);
 
         const orders = await orderModel.find({
             'items.product': { $in: productIds }
         }).sort({ createdAt: -1 });
 
-        // console.log(orders);
-        
-
         const filteredOrders = orders.map((order) => {
             const filteredItems = order.items.filter((item) =>
-                productIds.map(id => id.equals(item.product))
+                productIds.some(id => id.equals(item.product))
             );
 
             return {
@@ -92,7 +81,7 @@ async function getOrders(req, res) {
         }).filter((order) => order.items.length > 0);
 
         return res.json(filteredOrders);
-        
+
     } catch (error) {
         console.error("Error fetching orders:", error)
         return res.status(500).json({
@@ -100,25 +89,24 @@ async function getOrders(req, res) {
         });
     }
 }
+
 async function getProducts(req, res) {
-    try{
+    try {
         const sellerId = req.user.id;
 
         const products = await productModel.find({
-            seller:sellerId
-        }).sort({createdAt:-1});
+            seller: sellerId
+        }).sort({ createdAt: -1 });
 
         return res.json(products);
 
-    }catch (error) {
+    } catch (error) {
         console.error("Error fetching products:", error)
         return res.status(500).json({
             message: "Internal Server Error"
         });
     }
 }
-
-
 
 
 module.exports = {
