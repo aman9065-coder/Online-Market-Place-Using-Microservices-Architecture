@@ -7,7 +7,7 @@ const axios = require('axios');
 const searchProducts = tool(async ({ query, token }) => {
     // console.log(query , token);
     
-    const response = await axios.get(`-alb-1417250781.ap-south-1.elb.amazonaws.com/api/products?q=${query}`, {
+    const response = await axios.get(`${process.env.PRODUCT_SERVICE_URL}/api/products?q=${query}`, {
         headers: {
             Authorization: `Bearer ${token}`
         }
@@ -24,7 +24,7 @@ const searchProducts = tool(async ({ query, token }) => {
 
 const addProductToCart = tool(async ({ productId, quantity = 1, token }) => {
 
-    const response = await axios.post('http://vendex-alb-1-1449366652.ap-south-1.elb.amazonaws.com/api/cart/items',{
+    const response = await axios.post(`${process.env.CART_SERVICE_URL}/api/cart/items`,{
         productId,quantity
     },{
         headers:{

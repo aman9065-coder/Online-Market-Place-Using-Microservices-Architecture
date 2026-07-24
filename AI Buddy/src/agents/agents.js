@@ -5,14 +5,14 @@ const {ToolMessage,AIMessage} = require('@langchain/core/messages');
 
 
 const model = new ChatGoogleGenerativeAI({
-    model:'gemini-2.5-flash',
+    model:'gemini-3.5-flash',
     temperature:0.5
 });
 
 
 const graph = new StateGraph(MessagesAnnotation)
 .addNode("tools",async(state,config)=>{ 
-    // console.log(state);
+    console.log(state);
     const lastMessage = state.messages[state.messages.length-1];
 
     const toolsCall = lastMessage.tool_calls;    
